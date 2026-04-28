@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinjam Barang</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📥 Pinjam Barang</h1>
+        </header>
+        <nav>
+            <a href="1ajar.html">🏠 Guru</a>
+            <a href="1.pinjam.html">📥 Pinjam</a>
+            <a href="1kembalikan.html">↩️ Kembalikan</a>
+            <a href="1data.html">📊 Data</a>
+            <a href="1minigame.html">🎮 Minigame</a>
+        </nav>
+        <main>
+            <section class="input-section">
+                <div class="card">
+                    <h3>Form Peminjaman</h3>
+                    <div class="input-group">
+                        <label for="borrowerName">Nama Peminjam:</label>
+                        <input type="text" id="borrowerName" placeholder="Masukkan nama lengkap">
+                    </div>
+                    <div class="input-group">
+                        <label for="borrowDate">Tanggal Peminjaman:</label>
+                        <input type="date" id="borrowDate" value="" min="">
+                    </div>
+                    <div class="input-group">
+                        <label for="room">Ruang Kelas:</label>
+                        <input type="text" id="room" placeholder="Contoh: A101, Lab1">
+                    </div>
+                    <div class="input-group">
+                        <label for="expectedReturnDate">Estimasi Pengembalian:</label>
+                        <input type="date" id="expectedReturnDate" min="">
+                    </div>
+                </div>
+            </section>
+
+            <h2>📦 Barang Tersedia</h2>
+            <div id="availableItems" class="item-list"></div>
+        </main>
+    </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+        import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
+        window.firebaseModules = { initializeApp, getDatabase };
+    </script>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script src="app.js"></script>
+<script>
+        // Render dihandle oleh app.js (renderPinjamPage)
+        window.addEventListener('dataUpdated', function () {
+            if (window.renderPinjamPage) window.renderPinjamPage();
+        });
+    </script>
+</body>
+
+</html>

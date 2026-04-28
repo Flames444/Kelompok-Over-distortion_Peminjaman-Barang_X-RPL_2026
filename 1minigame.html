@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Borrowing Quest - Minigame Peminjaman</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .game-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .quiz-question {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .quiz-options button {
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        .clicker-area {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .item-click {
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .item-click img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 3px solid #ddd;
+        }
+
+        .item-click:hover img {
+            border-color: #007bff;
+            transform: scale(1.05);
+        }
+
+        .score-board {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .timer {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .game-over {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script src="data.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Borrowing Quest</h1>
+            <p>Minigame tentang aturan peminjaman barang!</p>
+        </header>
+        <nav>
+            <a href="1ajar.html">🏠 Guru</a>
+            <a href="1.pinjam.html">📥 Pinjam</a>
+            <a href="1kembalikan.html">↩️ Kembalikan</a>
+            <a href="1data.html">📊 Data</a>
+            <a href="1minigame.html">🎮 Minigame</a>
+        </nav>
+        <main>
+            <div id="gameContainer" class="game-container">
+
+                <div class="score-board">
+                    <div>Skor: <span id="score">0</span></div>
+                    <div>Waktu: <span id="timer" class="timer">60</span>s</div>
+                    <div>Level: <span id="level">1</span></div>
+                    <div>Best Skor: <span id="bestScore">0</span></div>
+                </div>
+                <div id="leaderboardSection" class="leaderboard-card"
+                    style="background: linear-gradient(135deg, gold, orange); color: black; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                    <h3>🏆 Leaderboard Top 10</h3>
+                    <ul id="leaderList" style="text-align: left;"></ul>
+                </div>
+
+                <div id="quizMode">
+                    <div id="question" class="quiz-question"></div>
+                    <div id="options" class="quiz-options"></div>
+                </div>
+                <div id="clickerMode" class="hidden clicker-area">
+                    <h2>Clicker: Borrow/Return Items!</h2>
+                    <p>Klik barang yang <strong id="clickerTask">available</strong> untuk pinjam/return dengan benar.
+                    </p>
+                    <div id="clickerItems"></div>
+                </div>
+
+                <div id="gameOver" class="game-over hidden">
+                    <h2>Game Over!</h2>
+                    <p>Skor Akhir: <span id="finalScore"></span></p>
+                    <div>
+                        <input type="text" id="playerName" placeholder="Nama kamu" maxlength="20"
+                            style="padding: 10px; font-size: 16px; margin: 10px;">
+                        <button onclick="saveScore()" style="padding: 10px 20px; font-size: 16px;">Save Skor</button>
+                    </div>
+                    <button onclick="startGame()">Main Lagi</button>
+                </div>
+
+                <button id="startBtn" onclick="startGame()" style="padding:15px 30px; font-size:20px;">🚀 Mulai
+                    Game</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const GAME_DATA_KEY = 'borrowingQuestBestScore';
+        const LEADERBOARD_KEY = 'borrowingQuestLeaderboard';
+
+        const sampleItems = getData().items.map(item => ({
+            id: item.id,
+            name: item.name,
+            code: item.code,
+            image: item.image.replace('&amp;', '&'),
+            status: item.status || 'available'
+        }));
+
+
+        let score = 0, timeLeft = 60, level = 1, gameInterval, currentMode = 'quiz';
+        const questions = [
+            { q: 'Apa yang HARUS diisi saat PINJAM barang?', options: ['Nama peminjam', 'Nomor HP', 'Alamat rumah'], correct: 0 },
+            { q: 'Status barang "available" berarti?', options: ['Sedang dipinjam', 'Bisa dipinjam', 'Rusak'], correct: 1 },
+            { q: 'Untuk Proyektor (PR001), tombol apa yang ditekan?', options: ['KEMBALIKAN', 'PINJAM'], correct: 1 },
+
+            { q: 'Estimasi pengembalian adalah?', options: ['Tanggal pinjam', 'Tanggal kembalikan', 'Tanggal besok'], correct: 1 },
+            { q: 'Jika barang "borrowed", apa yang dilakukan?', options: ['Pinjam lagi', 'Kembalikan', 'Hapus'], correct: 1 }
+        ];
+        let currentQuestionIdx = 0, currentItemStatuses = [...sampleItems.map(i => i.status)];
+
+        function loadBestScore() {
+            const best = localStorage.getItem(GAME_DATA_KEY) || 0;
+            document.getElementById('bestScore').textContent = best;
+        }
+
+        function loadLeaderboard() {
+            const lb = localStorage.getItem(LEADERBOARD_KEY) || '[]';
+            const leaderboard = JSON.parse(lb).sort((a, b) => b.score - a.score).slice(0, 10);
+            const list = document.getElementById('leaderList');
+            list.innerHTML = leaderboard.map((entry, i) => `<li>${i + 1}. ${entry.name} - ${entry.score} (${new Date(entry.date).toLocaleDateString('id-ID')})</li>`).join('') || '<li>Belum ada skor</li>';
+            const best = localStorage.getItem(GAME_DATA_KEY) || 0;
+            document.getElementById('bestScore').textContent = best;
+        }
+
+        function saveScore() {
+            const name = document.getElementById('playerName').value.trim();
+            if (name) {
+                const lb = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
+                lb.push({ name, score, date: new Date().toISOString() });
+                lb.sort((a, b) => b.score - a.score);
+                lb.splice(20); // Keep top 20
+                localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lb));
+                document.getElementById('playerName').value = '';
+                loadLeaderboard();
+                saveBestScore();
+            } else {
+                alert('Masukkan nama!');
+            }
+        }
+
+
+        function saveBestScore() {
+            const best = localStorage.getItem(GAME_DATA_KEY) || 0;
+            if (score > best) {
+                localStorage.setItem(GAME_DATA_KEY, score);
+            }
+        }
+
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('timer').textContent = timeLeft;
+            document.getElementById('level').textContent = level;
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIdx >= questions.length) {
+                switchToClicker();
+                return;
+            }
+            const q = questions[currentQuestionIdx];
+            document.getElementById('question').innerHTML = `Pertanyaan ${currentQuestionIdx + 1}: ${q.q}`;
+            document.getElementById('options').innerHTML = q.options.map((opt, i) =>
+                `<button onclick="answer(${i})">${opt}</button>`
+            ).join('');
+        }
+
+        function answer(selected) {
+            const q = questions[currentQuestionIdx];
+            if (selected === q.correct) {
+                score += 10 * level;
+            } else {
+                score -= 5;
+            }
+            currentQuestionIdx++;
+            updateDisplay();
+            setTimeout(nextQuestion, 1000);
+        }
+
+        function switchToClicker() {
+            document.getElementById('quizMode').classList.add('hidden');
+            document.getElementById('clickerMode').classList.remove('hidden');
+            currentMode = 'clicker';
+            renderClicker();
+        }
+
+        function renderClicker() {
+            const task = Math.random() > 0.5 ? 'available (PINJAM)' : 'borrowed (KEMBALIKAN)';
+            document.getElementById('clickerTask').textContent = task;
+            document.getElementById('clickerItems').innerHTML = sampleItems.map((item, idx) =>
+                `<div class="item-click" onclick="clickItem(${idx})">
+                    <img src="${item.image}" alt="${item.name}" title="${item.name} (${item.code}) - ${item.status}">
+                    <p>${item.status}</p>
+                </div>`
+            ).join('');
+        }
+
+        function clickItem(idx) {
+            const status = currentItemStatuses[idx];
+            const taskType = document.getElementById('clickerTask').textContent;
+            const isCorrect = (taskType.includes('available') && status === 'available') || (taskType.includes('borrowed') && status === 'borrowed');
+            if (isCorrect) {
+                score += 20;
+                // Toggle status for realism
+                currentItemStatuses[idx] = status === 'available' ? 'borrowed' : 'available';
+            } else {
+                score -= 10;
+            }
+            updateDisplay();
+            renderClicker();
+        }
+
+        function gameLoop() {
+            timeLeft--;
+            updateDisplay();
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function startGame() {
+            score = 0; timeLeft = 60; level = 1; currentQuestionIdx = 0; currentMode = 'quiz';
+            currentItemStatuses = [...sampleItems.map(i => i.status)];
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('quizMode').classList.remove('hidden');
+            document.getElementById('clickerMode').classList.add('hidden');
+            document.getElementById('gameOver').classList.add('hidden');
+            nextQuestion();
+            gameInterval = setInterval(gameLoop, 1000);
+            updateDisplay();
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').classList.remove('hidden');
+            document.getElementById('startBtn').classList.remove('hidden');
+            loadLeaderboard(); // Update best & leader
+        }
+
+
+        // Init
+        loadLeaderboard();
+        updateDisplay();
+
+    </script>
+</body>
+
+</html>

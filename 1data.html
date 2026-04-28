@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Lengkap & Riwayat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📈 Data Barang & Riwayat Peminjaman</h1>
+        </header>
+        <nav>
+            <a href="1ajar.html">🏠 Guru</a>
+            <a href="1.pinjam.html">📥 Pinjam</a>
+            <a href="1kembalikan.html">↩️ Kembalikan</a>
+            <a href="1data.html">📊 Data</a>
+            <a href="1minigame.html">🎮 Minigame</a>
+        </nav>
+        <main>
+            <section>
+                <h2>Statistik</h2>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div class="card">
+                        <h3 id="totalItems">-</h3>
+                        <p>Total Barang</p>
+                    </div>
+                    <div class="card">
+                        <h3 id="available">-</h3>
+                        <p>Tersedia</p>
+                    </div>
+                    <div class="card">
+                        <h3 id="borrowed">-</h3>
+                        <p>Dipinjam</p>
+                    </div>
+                    <div class="card">
+                        <h3 id="returned">-</h3>
+                        <p>Dikembalikan</p>
+                    </div>
+            </section>
+
+            <section>
+                <h2>Tabel Semua Barang</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Ruang Kelas</th>
+                            <th>Peminjam</th>
+                            <th>Status</th>
+                            <th>Tgl Peminjaman</th>
+                            <th>Estimasi Kembali</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTable">
+                        <!-- Rendered by app.js -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Riwayat Peminjaman & Pengembalian (Terbaru 20)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                            <th>Barang (Kode)</th>
+                            <th>Ruang</th>
+                            <th>Peminjam</th>
+                            <th>Tgl Pinjam</th>
+                            <th>Estimasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTable">
+                        <!-- Rendered by app.js -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+        import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
+        window.firebaseModules = { initializeApp, getDatabase };
+    </script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

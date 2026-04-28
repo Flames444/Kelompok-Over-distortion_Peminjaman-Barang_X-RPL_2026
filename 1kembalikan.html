@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kembalikan Barang</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+        import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
+        window.firebaseModules = { initializeApp, getDatabase };
+    </script>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script src="app.js"></script>
+    <style>
+        .return-btn {
+            background: #dc3545 !important;
+            color: white !important;
+            padding: 12px 24px !important;
+        }
+
+        table {
+            margin-top: 20px;
+        }
+
+        #borrowedTable img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>↩️ Kembalikan Barang</h1>
+        </header>
+        <nav>
+            <a href="1ajar.html">🏠 Guru</a>
+            <a href="1.pinjam.html">📥 Pinjam</a>
+            <a href="1kembalikan.html">↩️ Kembalikan</a>
+            <a href="1data.html">📊 Data</a>
+            <a href="1minigame.html">🎮 Minigame</a>
+        </nav>
+        <main>
+            <h2>Barang yang Dipinjam</h2>
+            <table id="borrowedTable">
+                <thead>
+                    <tr>
+                        <th>Gambar</th>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th>Peminjam</th>
+                        <th>Tgl Pinjam</th>
+                        <th>Estimasi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic by app.js renderKembalikanPage() -->
+                </tbody>
+            </table>
+
+            <h2>Riwayat Pengembalian</h2>
+            <table id="returnHistoryTable">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Barang</th>
+                        <th>Peminjam</th>
+                        <th>Tgl Pinjam</th>
+                        <th>Estimasi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic by app.js -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+
+</html>

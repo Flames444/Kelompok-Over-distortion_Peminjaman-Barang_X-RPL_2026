@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinjam Barang Keperluan Mengajar</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .teacher-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .quick-link-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s;
+        }
+
+        .quick-link-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+        import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
+        window.firebaseModules = { initializeApp, getDatabase };
+    </script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Pinjam Barang Keperluan Mengajar</h1>
+            <p>Sistem peminjaman barang untuk keperluan mengajar yang cepat dan mudah</p>
+        </header>
+
+        <nav>
+            <a href="1ajar.html">🏠 Guru</a>
+            <a href="1.pinjam.html">📥 Pinjam</a>
+            <a href="1kembalikan.html">↩️ Kembalikan</a>
+            <a href="1data.html">📊 Data</a>
+            <a href="1minigame.html">🎮 Minigame</a>
+        </nav>
+
+        <main>
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>Selamat Datang, Guru!</h2>
+                <p>Pilih barang untuk keperluan mengajar Anda hari ini</p>
+            </section>
+
+            <!-- Quick Action Links -->
+            <section class="quick-links">
+                <a href="1.pinjam.html" class="quick-link-card">
+                    <div class="icon">📥</div>
+                    <h3>Pinjam Barang</h3>
+                    <p>Lihat barang tersedia & ajukan pinjam untuk kelas</p>
+                </a>
+                <a href="1data.html" class="quick-link-card">
+                    <div class="icon">📊</div>
+                    <h3>Lihat Data</h3>
+                    <p>Status semua barang & statistik peminjaman</p>
+                </a>
+                <a href="1kembalikan.html" class="quick-link-card">
+                    <div class="icon">↩️</div>
+                    <h3>Kembalikan Barang</h3>
+                    <p>Selesaikan peminjaman & update status</p>
+                </a>
+                <a href="1minigame.html" class="quick-link-card">
+                    <div class="icon">🎮</div>
+                    <h3>Minigame Edukasi</h3>
+                    <p>Quiz seru tentang aturan peminjaman</p>
+                </a>
+            </section>
+
+            <!-- Guru Form (opsional - quick borrow) -->
+            <section class="teacher-form">
+                <div class="card">
+                    <h3>Quick Pinjam untuk Mengajar</h3>
+                    <p>Guru bisa pinjam cepat (max 3 hari)</p>
+                    <div class="input-group">
+                        <label>Nama Guru:</label>
+                        <input type="text" id="guruName" placeholder="Nama lengkap">
+                    </div>
+                    <div class="input-group">
+                        <label>Ruang Kelas:</label>
+                        <input type="text" id="guruRoom" placeholder="A101, Lab Komputer">
+                    </div>
+                    <button onclick="quickBorrowForTeaching()" class="btn-primary"
+                        style="width:100%; padding:15px; font-size:18px;">
+                        🚀 Lihat Barang Tersedia & Pinjam
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function quickBorrowForTeaching() {
+            const name = document.getElementById('guruName').value;
+            const room = document.getElementById('guruRoom').value;
+            if (name && room) {
+                sessionStorage.setItem('quickBorrow', JSON.stringify({ name, room }));
+                window.location.href = '1.pinjam.html';
+            } else {
+                alert('Isi nama & ruang kelas!');
+            }
+        }
+
+        // Auto-fill di pinjam.html jika dari sini
+        document.addEventListener('DOMContentLoaded', () => {
+            const quick = sessionStorage.getItem('quickBorrow');
+            if (quick) {
+                sessionStorage.removeItem('quickBorrow');
+            }
+        });
+    </script>
+</body>
+
+</html>
